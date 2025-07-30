@@ -1,0 +1,6 @@
+<resources>
+    <string name="welcome">Chao mung</string>
+    <string name="button_ok">Dong y</string>
+    <string name="english">Tieng Anh</string>
+    <string name="vietnamese">Tieng Viet</string>
+</resources>
