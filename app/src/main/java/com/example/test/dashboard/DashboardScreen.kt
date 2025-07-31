@@ -5,10 +5,13 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.with
 import androidx.compose.foundation.BorderStroke
@@ -27,6 +30,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Mail
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
@@ -34,7 +41,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -51,6 +57,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -75,7 +82,6 @@ import com.example.test.multiple_lang.presentation.viewmodel.SignUpViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import kotlin.math.roundToInt
-import kotlin.math.sign
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -109,7 +115,6 @@ fun DashboardScreen(navController: NavHostController) {
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Nền background nếu cần
         Image(
             painter = painterResource(id = R.drawable.dashboard_background),
             contentDescription = null,
@@ -247,14 +252,38 @@ fun DashboardScreen(navController: NavHostController) {
                     }
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
-                    .background(Color.White)
+                    .background(
+                        color = Color(0xFFBDD1C5)
+                    )
                     .animateContentSize()
                     .padding(24.dp)
             ) {
                 AnimatedContent(
                     targetState = isSignIn,
                     transitionSpec = {
-                        fadeIn(tween(300)) with fadeOut(tween(300))
+                        if (targetState) {
+                            // Từ SignUp → SignIn (trượt từ phải)
+                            slideInHorizontally(
+                                animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing),
+                                initialOffsetX = { fullWidth -> fullWidth }
+                            ) + fadeIn(animationSpec = tween(250)) with
+
+                                    slideOutHorizontally(
+                                        animationSpec = tween(250, easing = FastOutSlowInEasing),
+                                        targetOffsetX = { fullWidth -> -fullWidth / 4 }
+                                    ) + fadeOut(animationSpec = tween(250))
+                        } else {
+                            // Từ SignIn → SignUp (trượt từ trái)
+                            slideInHorizontally(
+                                animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing),
+                                initialOffsetX = { fullWidth -> -fullWidth }
+                            ) + fadeIn(animationSpec = tween(250)) with
+
+                                    slideOutHorizontally(
+                                        animationSpec = tween(250, easing = FastOutSlowInEasing),
+                                        targetOffsetX = { fullWidth -> fullWidth / 4 }
+                                    ) + fadeOut(animationSpec = tween(250))
+                        }
                     }
                 ) { target ->
                     if (target) {
@@ -305,7 +334,8 @@ fun SignInContent(onSwitch: () -> Unit, navController: NavHostController, onLoad
         Text(
             "Sign in to continue",
             fontWeight = FontWeight.SemiBold,
-            fontSize = 22.sp
+            fontSize = 22.sp,
+            color = Color.White
         )
         Spacer(Modifier.height(24.dp))
 
@@ -330,9 +360,21 @@ fun SignInContent(onSwitch: () -> Unit, navController: NavHostController, onLoad
                     .fillMaxWidth()
                     .focusRequester(emailFocusRequester),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    focusedLabelColor = Color.White,
+                    unfocusedLabelColor = Color.White,
+                    focusedBorderColor = Color.White,
+                    unfocusedBorderColor = Color.White,
+                    cursorColor = Color.White
                 ),
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Email,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                },
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Next
                 ),
@@ -357,8 +399,13 @@ fun SignInContent(onSwitch: () -> Unit, navController: NavHostController, onLoad
                     .fillMaxWidth()
                     .focusRequester(passwordFocusRequester),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    focusedLabelColor = Color.White,
+                    unfocusedLabelColor = Color.White,
+                    focusedBorderColor = Color.White,
+                    unfocusedBorderColor = Color.White,
+                    cursorColor = Color.White
                 ),
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Done
@@ -368,6 +415,13 @@ fun SignInContent(onSwitch: () -> Unit, navController: NavHostController, onLoad
                         focusManager.clearFocus()
                     }
                 ),
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Lock,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                },
                 trailingIcon = {
                     IconButton(
                         onClick = { isShowPassword = !isShowPassword }
@@ -375,7 +429,7 @@ fun SignInContent(onSwitch: () -> Unit, navController: NavHostController, onLoad
                         Icon(
                             imageVector = if (isShowPassword) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
                             contentDescription = null,
-                            tint = Color.Black.copy(alpha = 0.5f)
+                            tint = Color.White
                         )
                     }
 
@@ -402,6 +456,9 @@ fun SignInContent(onSwitch: () -> Unit, navController: NavHostController, onLoad
                             }
                         }
                 },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF2F6650)
+                ),
                 shape = RoundedCornerShape(8.dp),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -421,7 +478,8 @@ fun SignInContent(onSwitch: () -> Unit, navController: NavHostController, onLoad
                 onClick = { onSwitch() }
             ) {
                 Text(
-                    "Don't have an account? Sign up"
+                    "Don't have an account? Sign up",
+                    color = Color.White
                 )
             }
         }
@@ -452,6 +510,7 @@ fun SignUpContent(
             fontWeight = FontWeight.SemiBold,
             fontSize = 22.sp,
             textAlign = TextAlign.Start,
+            color = Color.White,
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(24.dp))
@@ -464,9 +523,21 @@ fun SignUpContent(
             shape = RoundedCornerShape(8.dp),
             modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black
-            )
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White,
+                focusedLabelColor = Color.White,
+                unfocusedLabelColor = Color.White,
+                focusedBorderColor = Color.White,
+                unfocusedBorderColor = Color.White,
+                cursorColor = Color.White
+            ),
+            leadingIcon = {
+                Icon(
+                    Icons.Default.Person,
+                    contentDescription = null,
+                    tint = Color.White
+                )
+            }
         )
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -478,9 +549,21 @@ fun SignUpContent(
             shape = RoundedCornerShape(8.dp),
             modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black
-            )
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White,
+                focusedLabelColor = Color.White,
+                unfocusedLabelColor = Color.White,
+                focusedBorderColor = Color.White,
+                unfocusedBorderColor = Color.White,
+                cursorColor = Color.White
+            ),
+            leadingIcon = {
+                Icon(
+                    Icons.Default.Email,
+                    contentDescription = null,
+                    tint = Color.White
+                )
+            }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -493,15 +576,27 @@ fun SignUpContent(
             shape = RoundedCornerShape(8.dp),
             modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White,
+                focusedLabelColor = Color.White,
+                unfocusedLabelColor = Color.White,
+                focusedBorderColor = Color.White,
+                unfocusedBorderColor = Color.White,
+                cursorColor = Color.White
             ),
+            leadingIcon = {
+                Icon(
+                    Icons.Default.Lock,
+                    contentDescription = null,
+                    tint = Color.White
+                )
+            },
             trailingIcon = {
                 IconButton(onClick = { isShowPassword = !isShowPassword }) {
                     Icon(
                         imageVector = if (isShowPassword) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
                         contentDescription = null,
-                        tint = Color.Black
+                        tint = Color.White
                     )
                 }
             },
@@ -517,6 +612,9 @@ fun SignUpContent(
             },
             enabled = !isLoading,
             shape = RoundedCornerShape(8.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF2F6650)
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp)
@@ -534,7 +632,7 @@ fun SignUpContent(
         TextButton(
             onClick = { onSwitch() }
         ) {
-            Text("Already have an account? Sign in")
+            Text("Already have an account? Sign in", color = Color.White)
         }
     }
 }

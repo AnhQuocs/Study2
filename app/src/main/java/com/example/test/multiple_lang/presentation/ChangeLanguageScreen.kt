@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,11 +27,14 @@ import com.example.test.multiple_lang.Hotel
 import com.example.test.multiple_lang.localized
 import com.example.test.multiple_lang.presentation.viewmodel.HotelViewModel
 import com.example.test.shimmer_loading.HotelCard
+import com.example.test.weather.presentation.ui.WeatherSection
 
 @Composable
 fun HotelList(viewModel: HotelViewModel) {
     val hotels by viewModel.hotels.collectAsState()
     val language by viewModel.language.collectAsState()
+
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -58,6 +62,8 @@ fun HotelList(viewModel: HotelViewModel) {
                 Text("Tiếng Việt")
             }
         }
+
+        WeatherSection(context = context)
 
         HotelCard(viewModel)
     }

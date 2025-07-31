@@ -13,11 +13,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.test.auth.HomeScreen
+import com.example.test.dashboard.DashboardScreen
 import com.example.test.multiple_lang.data.repository.HotelRepository
 import com.example.test.multiple_lang.domain.usecase.GetHotelsUseCase
+import com.example.test.multiple_lang.for_values.MyApp
 import com.example.test.multiple_lang.presentation.viewmodel.HotelViewModel
-import com.example.test.dashboard.DashboardScreen
 import com.example.test.ui.theme.TestTheme
+import com.example.test.weather.presentation.ui.WeatherSection
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,10 +35,9 @@ class MainActivity : ComponentActivity() {
             val viewModel = remember { HotelViewModel(GetHotelsUseCase(HotelRepository()), context) }
 
             TestTheme {
-//                HotelScreen(viewModel)
-//                ShimmerLoadingAnimation()
-//                HotelListScreen(viewModel)
-                AuthApp(viewModel)
+//                AuthApp(viewModel)
+//                WeatherSection(context = context)
+                MyApp()
             }
         }
     }
