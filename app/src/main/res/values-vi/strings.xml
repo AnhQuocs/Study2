@@ -1,4 +1,5 @@
 <resources>
+    <string name="app_name">Test</string>
     <string name="welcome">Chao mung</string>
     <string name="button_ok">Dong y</string>
     <string name="english">Tieng Anh</string>

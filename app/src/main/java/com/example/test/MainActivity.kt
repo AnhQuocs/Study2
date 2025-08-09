@@ -1,64 +1,65 @@
 package com.example.test
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.test.auth.HomeScreen
-import com.example.test.dashboard.DashboardScreen
-import com.example.test.multiple_lang.data.repository.HotelRepository
-import com.example.test.multiple_lang.domain.usecase.GetHotelsUseCase
-import com.example.test.multiple_lang.for_values.MyApp
-import com.example.test.multiple_lang.presentation.viewmodel.HotelViewModel
+import com.example.test.flights.presentation.ui.FlightList
+import com.example.test.language.data.prefecences.LanguagePreferenceManager
+import com.example.test.language.domain.model.AppLanguage
+import com.example.test.language.utils.LanguageManager
 import com.example.test.ui.theme.TestTheme
-import com.example.test.weather.presentation.ui.WeatherSection
 import com.google.firebase.FirebaseApp
-import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.runBlocking
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    override fun attachBaseContext(newBase: Context) {
+        val updatedContext = runBlocking {
+            val manager = LanguagePreferenceManager(newBase)
+            val lang = manager.languageFlow.firstOrNull() ?: AppLanguage.ENGLISH
+            LanguageManager.setAppLocale(newBase, lang)
+        }
+        super.attachBaseContext(updatedContext)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         FirebaseApp.initializeApp(this)
         setContent {
             val context = LocalContext.current
-            val viewModel = remember { HotelViewModel(GetHotelsUseCase(HotelRepository()), context) }
 
             TestTheme {
-//                AuthApp(viewModel)
-//                WeatherSection(context = context)
-                MyApp()
+                FlightList()
             }
         }
     }
 }
 
-@Composable
-fun AuthApp(viewModel: HotelViewModel) {
-    val navController = rememberNavController()
-
-    val startDestination by remember {
-        mutableStateOf(
-            if(FirebaseAuth.getInstance().currentUser != null) "home"
-            else "dashboard"
-        )
-    }
-
-    NavHost(navController, startDestination = startDestination) {
-        composable("dashboard") { DashboardScreen(navController) }
-        composable("home") { HomeScreen(navController, viewModel) }
-    }
-}
+//@Composable
+//fun AuthApp(viewModel: HotelViewModel) {
+//    val navController = rememberNavController()
+//
+//    val startDestination by remember {
+//        mutableStateOf(
+//            if(FirebaseAuth.getInstance().currentUser != null) "home"
+//            else "dashboard"
+//        )
+//    }
+//
+//    NavHost(navController, startDestination = startDestination) {
+//        composable("dashboard") { DashboardScreen(navController) }
+//        composable("home") { HomeScreen(navController, viewModel) }
+//    }
+//}
 
 @Composable
 fun MainScreen() {

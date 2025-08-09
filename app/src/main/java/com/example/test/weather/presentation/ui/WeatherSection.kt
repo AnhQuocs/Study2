@@ -235,7 +235,6 @@ fun LoadingCard() {
 
 }
 
-@Preview(showBackground = true)
 @Composable
 fun ErrorCard() {
     val gradient = Brush.linearGradient(
