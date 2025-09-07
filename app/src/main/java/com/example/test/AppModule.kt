@@ -1,6 +1,9 @@
 package com.example.test
 
 import android.content.Context
+import coil.ImageLoader
+import coil.disk.DiskCache
+import coil.util.CoilUtils
 import com.example.test.flights.data.repository.FlightRepositoryImpl
 import com.example.test.flights.data.source.FirebaseFlightDataSource
 import com.example.test.flights.domain.repository.FlightRepository
@@ -19,6 +22,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
@@ -102,5 +106,22 @@ object AppModule {
     @Singleton
     fun provideFirebaseFlightDataSource(): FirebaseFlightDataSource {
         return FirebaseFlightDataSource()
+    }
+
+    // Share Element
+    @Provides
+    @Singleton
+    fun provideImageLoader(
+        @ApplicationContext context: Context
+    ): ImageLoader {
+        return ImageLoader.Builder(context)
+            .crossfade(true)
+            .diskCache {
+                DiskCache.Builder()
+                    .directory(context.cacheDir.resolve("image_cache"))
+                    .maxSizePercent(0.02)
+                    .build()
+            }
+            .build()
     }
 }

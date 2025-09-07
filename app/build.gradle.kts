@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.google.gms.google.services)
     id("com.google.dagger.hilt.android")
     kotlin("kapt")
+    id ("kotlin-parcelize")
 }
 
 android {
@@ -80,6 +81,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    implementation(libs.androidx.compose.animation)
+
     implementation("androidx.compose.material:material-icons-extended")
 
     // Hilt
@@ -122,4 +125,7 @@ dependencies {
 
     // Full layout without Status Bar
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.33.1-alpha")
+
+    // Compose UI
+    implementation("androidx.compose.ui:ui:1.7.0-alpha08")
 }
